@@ -72,23 +72,25 @@ scripts/generate-app-icon.sh
 
 ## Publishing a release
 
-The release workflow follows the same signing approach as [Reco](https://github.com/danielcorin/Reco). Signing details remain in the ignored `Configuration/Local.xcconfig`; the release script resolves the version, build number, bundle ID, and development team from Xcode.
+The release workflow follows the same signing approach as [Reco](https://github.com/danielcorin/Reco). Signing details can remain in the ignored `Configuration/Local.xcconfig`, or be supplied through environment variables. The release script resolves the version, build number, bundle ID, and development team from those inputs and Xcode.
 
-Create a reusable Keychain profile once. The command securely prompts for an app-specific password:
+For a non-interactive notarized build, export the release credentials from your shell, secret manager, or ignored `.envrc`:
 
 ```sh
-scripts/publish-release.sh \
-  --setup-notary-profile MoNotary \
-  --apple-id you@example.com
+export APPLE_ID="you@example.com"
+export APPLE_ID_PASSWORD="your-app-specific-password"
+export DEVELOPER_ID_APPLICATION="Developer ID Application: Your Name (TEAMID)"
+export TEAM_ID="TEAMID"
 ```
 
 Before a release, update `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION`, then commit and push the changes. Run:
 
 ```sh
-NOTARY_PROFILE=MoNotary \
 GH_REPO=danielcorin/Mo \
 scripts/publish-release.sh --publish
 ```
+
+As a Keychain-based alternative, run `scripts/publish-release.sh --setup-notary-profile MoNotary` once, then publish with `NOTARY_PROFILE=MoNotary`. The setup command uses `APPLE_ID` and `APPLE_ID_PASSWORD` when available, or prompts securely when the password is absent. Legacy `DEVELOPMENT_TEAM`, `DEVELOPER_IDENTITY`, and `NOTARY_APPLE_ID` variables remain supported.
 
 The script requires a clean branch synchronized with its upstream, creates a universal archive, Developer ID-signs and uploads it through Xcode, waits for notarization, verifies the exported app, produces ZIP and DMG artifacts, notarizes the outer DMG, writes SHA-256 checksums, and creates the GitHub release. Use `--dry-run` to inspect the release plan.
 

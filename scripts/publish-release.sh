@@ -22,8 +22,8 @@ Release options:
   --project PATH             Xcode project (default: Mo.xcodeproj).
   --scheme NAME              Xcode scheme (default: Mo).
   --configuration NAME       Build configuration (default: Release).
-  --team-id ID               Override the resolved DEVELOPMENT_TEAM.
-  --identity IDENTITY        Developer ID Application signing identity.
+  --team-id ID               Override TEAM_ID or the resolved DEVELOPMENT_TEAM.
+  --identity IDENTITY        Override DEVELOPER_ID_APPLICATION signing identity.
   --notary-profile PROFILE   notarytool Keychain profile for the outer DMG.
   --notary-timeout SECONDS   App notarization wait limit (default: 1800).
   --output-dir PATH          Artifact directory (default: dist).
@@ -39,12 +39,18 @@ Release options:
 Credential setup:
   --setup-notary-profile PROFILE
                              Store an app-specific password in Keychain.
-  --apple-id APPLE_ID        Apple ID used by credential setup. The password is
-                             requested with a secure interactive prompt.
+  --apple-id APPLE_ID        Override APPLE_ID for credential setup. The password
+                             comes from APPLE_ID_PASSWORD or a secure prompt.
 
 Environment equivalents:
-  DEVELOPER_IDENTITY, DEVELOPMENT_TEAM, NOTARY_PROFILE, NOTARY_APPLE_ID,
-  NOTARY_TIMEOUT, RELEASE_OUTPUT_DIR, GH_REPO
+  APPLE_ID, APPLE_ID_PASSWORD, DEVELOPER_ID_APPLICATION, TEAM_ID,
+  NOTARY_PROFILE, NOTARY_TIMEOUT, RELEASE_OUTPUT_DIR, GH_REPO
+
+Legacy aliases remain supported:
+  DEVELOPER_IDENTITY, DEVELOPMENT_TEAM, NOTARY_APPLE_ID
+
+For DMG notarization, export APPLE_ID, APPLE_ID_PASSWORD, and TEAM_ID, or use a
+NOTARY_PROFILE stored in Keychain. APPLE_ID_PASSWORD is never printed.
 
 The project version and build number must already be committed. --version and
 --build verify those values; they never rewrite or silently override the source.
@@ -62,6 +68,17 @@ require_value() {
 
 command_exists() {
     command -v "$1" >/dev/null 2>&1 || fail "required command not found: $1"
+}
+
+notarytool_with_auth() {
+    if [[ "$NOTARY_AUTH_MODE" == "profile" ]]; then
+        xcrun notarytool "$@" --keychain-profile "$NOTARY_PROFILE"
+    else
+        xcrun notarytool "$@" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_PASSWORD" \
+            --team-id "$TEAM_ID"
+    fi
 }
 
 load_build_settings() {
@@ -295,10 +312,11 @@ SCHEME="Mo"
 CONFIGURATION="Release"
 EXPECTED_VERSION=""
 EXPECTED_BUILD=""
-TEAM_ID="${DEVELOPMENT_TEAM:-}"
-IDENTITY="${DEVELOPER_IDENTITY:-}"
+TEAM_ID="${TEAM_ID:-${DEVELOPMENT_TEAM:-}}"
+IDENTITY="${DEVELOPER_ID_APPLICATION:-${DEVELOPER_IDENTITY:-}}"
 NOTARY_PROFILE="${NOTARY_PROFILE:-}"
-APPLE_ID="${NOTARY_APPLE_ID:-}"
+APPLE_ID="${APPLE_ID:-${NOTARY_APPLE_ID:-}}"
+APPLE_ID_PASSWORD="${APPLE_ID_PASSWORD:-}"
 NOTARY_TIMEOUT_SECONDS="${NOTARY_TIMEOUT:-1800}"
 NOTARY_POLL_SECONDS=20
 GH_REPOSITORY="${GH_REPO:-}"
@@ -315,6 +333,7 @@ BUILD_SETTINGS=""
 WORK_DIR=""
 HEAD_COMMIT=""
 RELEASE_EXISTS=0
+NOTARY_AUTH_MODE=""
 GH_ARGS=()
 
 while [[ $# -gt 0 ]]; do
@@ -448,7 +467,7 @@ XCODE_CONTEXT=(-project "$PROJECT_PATH" -scheme "$SCHEME" -configuration "$CONFI
 if [[ -n "$SETUP_PROFILE" ]]; then
     [[ -z "$APP_PATH" ]] || fail "credential setup cannot be combined with an app path"
     [[ "$PUBLISH" -eq 0 ]] || fail "credential setup cannot be combined with --publish"
-    [[ -n "$APPLE_ID" ]] || fail "--apple-id or NOTARY_APPLE_ID is required for credential setup"
+    [[ -n "$APPLE_ID" ]] || fail "--apple-id or APPLE_ID is required for credential setup"
 
     resolve_source_metadata
     [[ "$TEAM_ID" =~ ^[A-Z0-9]{10}$ ]] || fail "invalid Developer Team ID: $TEAM_ID"
@@ -462,10 +481,18 @@ if [[ -n "$SETUP_PROFILE" ]]; then
         exit 0
     fi
 
-    echo "notarytool will securely prompt for an app-specific password."
-    xcrun notarytool store-credentials "$SETUP_PROFILE" \
-        --apple-id "$APPLE_ID" \
-        --team-id "$TEAM_ID"
+    if [[ -n "$APPLE_ID_PASSWORD" ]]; then
+        echo "Using APPLE_ID_PASSWORD from the environment."
+        xcrun notarytool store-credentials "$SETUP_PROFILE" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_PASSWORD" \
+            --team-id "$TEAM_ID"
+    else
+        echo "notarytool will securely prompt for an app-specific password."
+        xcrun notarytool store-credentials "$SETUP_PROFILE" \
+            --apple-id "$APPLE_ID" \
+            --team-id "$TEAM_ID"
+    fi
     echo "Stored and validated notary profile '$SETUP_PROFILE'."
     echo "Use it with: NOTARY_PROFILE='$SETUP_PROFILE' scripts/publish-release.sh --publish"
     exit 0
@@ -497,8 +524,16 @@ if [[ -z "$IDENTITY" ]]; then
 fi
 [[ -n "$IDENTITY" ]] || fail "no Developer ID Application identity found for Team ID $TEAM_ID"
 
-if [[ "$SKIP_DMG_NOTARIZATION" -eq 0 && -z "$NOTARY_PROFILE" ]]; then
-    fail "--notary-profile or NOTARY_PROFILE is required; use --setup-notary-profile once, or explicitly pass --skip-dmg-notarization"
+if [[ "$SKIP_DMG_NOTARIZATION" -eq 0 ]]; then
+    if [[ -n "$NOTARY_PROFILE" ]]; then
+        NOTARY_AUTH_MODE="profile"
+    elif [[ -n "$APPLE_ID" && -n "$APPLE_ID_PASSWORD" ]]; then
+        NOTARY_AUTH_MODE="environment"
+    elif [[ -n "$APPLE_ID" || -n "$APPLE_ID_PASSWORD" ]]; then
+        fail "both APPLE_ID and APPLE_ID_PASSWORD are required for environment-based notarization"
+    else
+        fail "export APPLE_ID and APPLE_ID_PASSWORD, provide --notary-profile/NOTARY_PROFILE, or explicitly pass --skip-dmg-notarization"
+    fi
 fi
 
 case "$OUT_DIR" in
@@ -526,8 +561,10 @@ echo "  Identity:     $IDENTITY"
 echo "  Architectures: arm64 + x86_64 required"
 if [[ "$SKIP_DMG_NOTARIZATION" -eq 1 ]]; then
     echo "  DMG:          signed; notarization explicitly skipped"
-else
+elif [[ "$NOTARY_AUTH_MODE" == "profile" ]]; then
     echo "  DMG:          signed and notarized with profile '$NOTARY_PROFILE'"
+else
+    echo "  DMG:          signed and notarized with environment credentials"
 fi
 echo "  Output:       $OUT_DIR"
 if [[ "$PUBLISH" -eq 1 ]]; then
@@ -546,9 +583,12 @@ for command in ditto find grep hdiutil lipo mktemp plutil shasum spctl; do
 done
 
 if [[ "$SKIP_DMG_NOTARIZATION" -eq 0 ]]; then
-    echo "Validating notary profile '$NOTARY_PROFILE'..."
-    xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" >/dev/null || \
-        fail "notary profile '$NOTARY_PROFILE' is unavailable or invalid"
+    if [[ "$NOTARY_AUTH_MODE" == "profile" ]]; then
+        echo "Validating notary profile '$NOTARY_PROFILE'..."
+    else
+        echo "Validating notarization credentials from the environment..."
+    fi
+    notarytool_with_auth history >/dev/null || fail "notarization credentials are unavailable or invalid"
 fi
 
 TMP_BASE="${TMPDIR:-/tmp}"
@@ -621,9 +661,7 @@ codesign --verify --verbose=4 "$DMG_PATH"
 
 if [[ "$SKIP_DMG_NOTARIZATION" -eq 0 ]]; then
     echo "Submitting the DMG for notarization..."
-    xcrun notarytool submit "$DMG_PATH" \
-        --keychain-profile "$NOTARY_PROFILE" \
-        --wait
+    notarytool_with_auth submit "$DMG_PATH" --wait
     xcrun stapler staple "$DMG_PATH"
     xcrun stapler validate "$DMG_PATH"
     spctl --assess --type open --context context:primary-signature --verbose=4 "$DMG_PATH"

@@ -2,6 +2,10 @@
 
 All notable changes to Mo will be documented here. This project follows [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+- Release tooling now natively supports `APPLE_ID`, `APPLE_ID_PASSWORD`, `DEVELOPER_ID_APPLICATION`, and `TEAM_ID`, with optional Keychain-profile and legacy-variable compatibility.
+
 ## 1.0.0 - 2026-07-13
 
 - Initial native macOS menu bar visibility manager.
