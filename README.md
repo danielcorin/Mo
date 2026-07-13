@@ -74,19 +74,19 @@ scripts/generate-app-icon.sh
 
 The release workflow follows the same signing approach as [Reco](https://github.com/danielcorin/Reco). Signing details can remain in the ignored `Configuration/Local.xcconfig`, or be supplied through environment variables. The release script resolves the version, build number, bundle ID, and development team from those inputs and Xcode.
 
-For a non-interactive notarized build, export the release credentials from your shell, secret manager, or ignored `.envrc`:
+For a non-interactive notarized build, copy the environment template and fill in the ignored `.env`. The committed `.envrc` loads it through [direnv](https://direnv.net/):
 
 ```sh
-export APPLE_ID="you@example.com"
-export APPLE_ID_PASSWORD="your-app-specific-password"
-export DEVELOPER_ID_APPLICATION="Developer ID Application: Your Name (TEAMID)"
-export TEAM_ID="TEAMID"
+cp .env.example .env
+$EDITOR .env
+direnv allow
 ```
+
+If you do not use direnv, export the same variables from your shell or secret manager instead. Never place credentials in `.envrc` or commit `.env`.
 
 Before a release, update `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION`, then commit and push the changes. Run:
 
 ```sh
-GH_REPO=danielcorin/Mo \
 scripts/publish-release.sh --publish
 ```
 
