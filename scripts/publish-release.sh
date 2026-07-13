@@ -213,7 +213,7 @@ prepare_github_release() {
     fi
 
     RELEASE_EXISTS=0
-    if gh release view "$TAG" "${GH_ARGS[@]}" >/dev/null 2>&1; then
+    if gh release view "$TAG" ${GH_ARGS[@]+"${GH_ARGS[@]}"} >/dev/null 2>&1; then
         RELEASE_EXISTS=1
         [[ "$REPLACE_EXISTING" -eq 1 ]] || \
             fail "GitHub Release $TAG already exists; bump the version or pass --replace-existing-release"
@@ -684,16 +684,16 @@ if [[ "$PUBLISH" -eq 1 ]]; then
     if [[ "$RELEASE_EXISTS" -eq 1 ]]; then
         gh release upload "$TAG" \
             "$ZIP_PATH" "$DMG_PATH" "$OUT_DIR/$CHECKSUM_NAME" \
-            --clobber "${GH_ARGS[@]}"
+            --clobber ${GH_ARGS[@]+"${GH_ARGS[@]}"}
     else
         gh release create "$TAG" \
             "$ZIP_PATH" "$DMG_PATH" "$OUT_DIR/$CHECKSUM_NAME" \
             --target "$HEAD_COMMIT" \
             --title "$PRODUCT_NAME $VERSION" \
             --generate-notes \
-            "${GH_ARGS[@]}"
+            ${GH_ARGS[@]+"${GH_ARGS[@]}"}
     fi
 
-    RELEASE_URL="$(gh release view "$TAG" "${GH_ARGS[@]}" --json url --jq .url)"
+    RELEASE_URL="$(gh release view "$TAG" ${GH_ARGS[@]+"${GH_ARGS[@]}"} --json url --jq .url)"
     echo "Published GitHub Release $TAG: $RELEASE_URL"
 fi
