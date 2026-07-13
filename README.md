@@ -1,7 +1,7 @@
 # Mo
 
 <p align="center">
-  <img src="Mo/Assets.xcassets/AppIcon.appiconset/AppIcon-128@2x.png" width="128" height="128" alt="Mo app icon">
+  <img src="Artwork/AppIcon-Transparent.svg" width="128" height="128" alt="Mo app icon">
 </p>
 
 Mo is a small, native macOS menu bar app that keeps the menu bar tidy. Put items on the hidden side of Mo's divider, then reveal or collapse them with a click or a global shortcut.
