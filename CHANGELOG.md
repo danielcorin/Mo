@@ -4,6 +4,9 @@ All notable changes to Mo will be documented here. This project follows [Semanti
 
 ## Unreleased
 
+## 1.0.1 - 2026-07-13
+
+- Added a layered Icon Composer app icon for macOS 26, with flattened fallbacks for earlier macOS versions.
 - Release tooling now natively supports `APPLE_ID`, `APPLE_ID_PASSWORD`, `DEVELOPER_ID_APPLICATION`, and `TEAM_ID`, with optional Keychain-profile and legacy-variable compatibility.
 
 ## 1.0.0 - 2026-07-13

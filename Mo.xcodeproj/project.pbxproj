@@ -6,6 +6,16 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		C0DEC0F13001D80200EEF7EB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B184C720300546C700F2E851 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B184C727300546C700F2E851;
+			remoteInfo = Mo;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		B184C728300546C700F2E851 /* Mo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0DEC0F03001D80200EEF7E8 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
@@ -54,15 +64,6 @@
 			);
 			sourceTree = "<group>";
 		};
-		C0DEC0F03001D80200EEF7EA /* Configuration */ = {
-			isa = PBXGroup;
-			children = (
-				C0DEC0F03001D80200EEF7E8 /* Shared.xcconfig */,
-				C0DEC0F03001D80200EEF7E9 /* Local.xcconfig.example */,
-			);
-			path = Configuration;
-			sourceTree = "<group>";
-		};
 		B184C729300546C700F2E851 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -72,17 +73,16 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-/* End PBXGroup section */
-
-/* Begin PBXContainerItemProxy section */
-		C0DEC0F13001D80200EEF7EB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B184C720300546C700F2E851 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B184C727300546C700F2E851;
-			remoteInfo = Mo;
+		C0DEC0F03001D80200EEF7EA /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				C0DEC0F03001D80200EEF7E8 /* Shared.xcconfig */,
+				C0DEC0F03001D80200EEF7E9 /* Local.xcconfig.example */,
+			);
+			path = Configuration;
+			sourceTree = "<group>";
 		};
-/* End PBXContainerItemProxy section */
+/* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
 		B184C727300546C700F2E851 /* Mo */ = {
@@ -338,7 +338,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -349,7 +349,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -368,7 +368,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -379,7 +379,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -395,7 +395,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.example.MoTests;
@@ -411,7 +411,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.example.MoTests;

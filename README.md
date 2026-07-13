@@ -1,7 +1,7 @@
 # Mo
 
 <p align="center">
-  <img src="Artwork/AppIcon-Transparent.svg" width="128" height="128" alt="Mo app icon">
+  <img src="Artwork/AppIcon.png" width="128" height="128" alt="Mo app icon">
 </p>
 
 Mo is a small, native macOS menu bar app that keeps the menu bar tidy. Put items on the hidden side of Mo's divider, then reveal or collapse them with a click or a global shortcut.
@@ -64,7 +64,9 @@ xcodebuild \
   test
 ```
 
-Regenerate all app icon sizes after changing `Artwork/AppIcon.svg` with:
+The app icon source of truth is `Mo/AppIcon.icon`, an [Icon Composer](https://developer.apple.com/icon-composer/) document. Xcode 26 and later compiles it into the layered macOS 26 icon and generates flattened fallbacks for older macOS versions. Edit it in Icon Composer, or edit `icon.json` and the layer assets directly.
+
+When building with an Xcode older than 26, the legacy `AppIcon.appiconset` is used instead. Regenerate its PNG sizes after changing `Artwork/AppIcon.svg` with:
 
 ```sh
 scripts/generate-app-icon.sh
