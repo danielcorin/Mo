@@ -52,9 +52,11 @@ struct SettingsView: View {
                 }
 
                 Toggle("Hide Mo's menu bar button", isOn: $preferences.hideToggle)
-                Text("While enabled, the button stays out of the menu bar in both states. Use \(preferences.hotkey.displayName) to toggle items, or reopen Mo to access settings.")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                Text(
+                    "While enabled, the button stays out of the menu bar in both states. Use \(preferences.hotkey.displayName) to toggle items, or reopen Mo to access settings."
+                )
+                .font(.callout)
+                .foregroundStyle(.secondary)
             }
 
             Section("Keyboard shortcut") {
@@ -66,9 +68,11 @@ struct SettingsView: View {
                         .font(.callout)
                         .foregroundStyle(.orange)
                 } else {
-                    Text("Mo registers one system shortcut and does not monitor or store your keystrokes. ⌘, remains reserved for the active app and cannot be assigned.")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
+                    Text(
+                        "Mo registers one system shortcut and does not monitor or store your keystrokes. ⌘, remains reserved for the active app and cannot be assigned."
+                    )
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
                 }
             }
 

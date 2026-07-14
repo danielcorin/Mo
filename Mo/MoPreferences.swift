@@ -84,7 +84,7 @@ struct Hotkey: Codable, Equatable {
             48: "Tab", 51: "Delete", 53: "Escape", 123: "←", 124: "→",
             125: "↓", 126: "↑", 122: "F1", 120: "F2", 99: "F3", 118: "F4",
             96: "F5", 97: "F6", 98: "F7", 100: "F8", 101: "F9", 109: "F10",
-            103: "F11", 111: "F12"
+            103: "F11", 111: "F12",
         ]
         return names[code] ?? "Key \(code)"
     }
@@ -133,17 +133,17 @@ final class MoPreferences: ObservableObject {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        self.autoHidePolicy = AutoHidePolicy(
-            rawValue: defaults.string(forKey: Key.autoHidePolicy) ?? ""
-        ) ?? .tenSeconds
+        self.autoHidePolicy =
+            AutoHidePolicy(
+                rawValue: defaults.string(forKey: Key.autoHidePolicy) ?? ""
+            ) ?? .tenSeconds
         if defaults.object(forKey: Key.hideToggle) != nil {
             self.hideToggle = defaults.bool(forKey: Key.hideToggle)
         } else {
             self.hideToggle = defaults.bool(forKey: Key.legacyHideToggleWhenHidden)
         }
 
-        if
-            let data = defaults.data(forKey: Key.hotkey),
+        if let data = defaults.data(forKey: Key.hotkey),
             let decoded = try? JSONDecoder().decode(Hotkey.self, from: data)
         {
             self.hotkey = decoded

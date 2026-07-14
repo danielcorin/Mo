@@ -22,7 +22,7 @@ final class GlobalHotkeyMonitor {
     private var hotkeyRef: EventHotKeyRef?
     private(set) var registrationError: String?
 
-    private let signature: OSType = 0x4D6F486B // "MoHk"
+    private let signature: OSType = 0x4D6F_486B  // "MoHk"
     private let identifier: UInt32 = 1
 
     func start(hotkey: Hotkey) {
