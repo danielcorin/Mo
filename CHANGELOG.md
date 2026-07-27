@@ -4,6 +4,12 @@ All notable changes to Mo will be documented here. This project follows [Semanti
 
 ## Unreleased
 
+## 1.0.2 - 2026-07-27
+
+- Fixed a memory leak that grew Mo's footprint to hundreds of megabytes over days of use. The collapsed divider reserved a fixed 10,000 points, and AppKit backed that status item's window with a buffer sized to its width, reallocating it on every menu bar relayout without releasing the previous one.
+- The collapsed divider is now sized to the widest attached screen, which is all it needs to push hidden items off the menu bar, and resizes when displays change.
+- The collapsed divider's button is hidden while it is acting as pure spacing, so AppKit no longer backs it with a buffer it would redraw on every relayout.
+
 ## 1.0.1 - 2026-07-13
 
 - Added a layered Icon Composer app icon for macOS 26, with flattened fallbacks for earlier macOS versions.

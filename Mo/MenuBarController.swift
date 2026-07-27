@@ -21,7 +21,22 @@ final class MenuBarController: NSObject, ObservableObject {
         static let toggle: CGFloat = 14
         static let hiddenToggle: CGFloat = 0
         static let divider: CGFloat = 8
-        static let collapsed: CGFloat = 10_000
+
+        /// Fallback for the collapsed width when no screen is available.
+        static let collapsedFallback: CGFloat = 2_000
+
+        /// Width the divider grows to in order to push hidden items off screen.
+        ///
+        /// AppKit backs the status item's window with a buffer sized to this
+        /// width (roughly `width × menuBarHeight × 4` bytes) and reallocates it
+        /// whenever the menu bar re-lays out, so an oversized constant costs
+        /// real memory on every relayout. Everything left of the divider is off
+        /// screen once the divider spans the menu bar, so the widest screen is
+        /// the tightest safe bound.
+        static var collapsed: CGFloat {
+            let widest = NSScreen.screens.map(\.frame.width).max() ?? collapsedFallback
+            return max(widest, collapsedFallback)
+        }
     }
 
     private let preferences: MoPreferences
@@ -40,6 +55,9 @@ final class MenuBarController: NSObject, ObservableObject {
         accessibilityDescription: "Hide menu bar items"
     )
     private lazy var visibleDividerImage = makeDividerImage()
+
+    /// Width the divider expands to when items are hidden.
+    static var collapsedDividerLength: CGFloat { Length.collapsed }
 
     var dividerLength: CGFloat? { dividerItem?.length }
     var toggleLength: CGFloat? { toggleItem?.length }
@@ -88,11 +106,22 @@ final class MenuBarController: NSObject, ObservableObject {
             }
             .store(in: &cancellables)
 
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(screenParametersDidChange),
+            name: NSApplication.didChangeScreenParametersNotification,
+            object: nil
+        )
     }
 
     func stop() {
         cancelAutoHide()
         hotkeyMonitor.stop()
+        NotificationCenter.default.removeObserver(
+            self,
+            name: NSApplication.didChangeScreenParametersNotification,
+            object: nil
+        )
         cancellables.removeAll()
         if let toggleItem { NSStatusBar.system.removeStatusItem(toggleItem) }
         if let dividerItem { NSStatusBar.system.removeStatusItem(dividerItem) }
@@ -179,12 +208,17 @@ final class MenuBarController: NSObject, ObservableObject {
                 toggleButton.toolTip = "Show hidden menu bar items (\(hotkeyDisplayName))"
                 dividerItem.button?.image = nil
                 dividerItem.button?.cell?.isEnabled = false
+                // Collapsed, the divider is pure spacing and draws nothing.
+                // Hiding the button keeps AppKit from backing a menu-bar-wide
+                // window with a buffer it would redraw on every relayout.
+                dividerItem.button?.isHidden = true
                 if dividerItem.length != Length.collapsed {
                     dividerItem.length = Length.collapsed
                 }
             case .shown:
                 toggleButton.image = hideItemsImage
                 toggleButton.toolTip = "Hide menu bar items (\(hotkeyDisplayName))"
+                dividerItem.button?.isHidden = false
                 dividerItem.button?.cell?.isEnabled = true
                 dividerItem.button?.image = visibleDividerImage
                 if dividerItem.length != Length.divider {
@@ -313,6 +347,12 @@ final class MenuBarController: NSObject, ObservableObject {
 
     @objc private func openSettingsFromMenu() {
         showSettings()
+    }
+
+    @objc private func screenParametersDidChange() {
+        // The collapsed width is derived from the screens, so re-apply it when
+        // displays are added, removed, or resized.
+        applyState()
     }
 
     @objc private func autoHideTimerFired() {

@@ -83,7 +83,13 @@ final class MoPreferencesTests: XCTestCase {
         defer { controller.stop() }
 
         XCTAssertEqual(controller.state, .hidden)
-        XCTAssertEqual(controller.dividerLength, 10_000)
+        XCTAssertEqual(controller.dividerLength, MenuBarController.collapsedDividerLength)
+        // The divider only hides items if it spans the menu bar it sits on, so
+        // it has to be at least as wide as the widest attached screen.
+        XCTAssertGreaterThanOrEqual(
+            MenuBarController.collapsedDividerLength,
+            NSScreen.screens.map(\.frame.width).max() ?? 0
+        )
         XCTAssertEqual(controller.toggleLength, 14)
         XCTAssertEqual(controller.isToggleVisible, true)
         let originalToggleIdentity = controller.toggleItemIdentity
@@ -102,7 +108,7 @@ final class MoPreferencesTests: XCTestCase {
 
         controller.setItemsShown(false)
         XCTAssertEqual(controller.state, .hidden)
-        XCTAssertEqual(controller.dividerLength, 10_000)
+        XCTAssertEqual(controller.dividerLength, MenuBarController.collapsedDividerLength)
         XCTAssertEqual(controller.isToggleVisible, false)
         XCTAssertEqual(controller.toggleItemIdentity, originalToggleIdentity)
 
