@@ -6,6 +6,16 @@
 
 Mo is a small, native macOS menu bar app that keeps the menu bar tidy. Put items on the hidden side of Mo's divider, then reveal or collapse them with a click or a global shortcut.
 
+## Screenshots
+
+<p align="center">
+  <img src="Artwork/Screenshots/menu-bar.png" width="448" alt="Mo's menu bar button with its context menu open">
+</p>
+
+<p align="center">
+  <img src="Artwork/Screenshots/settings.png" width="672" alt="Mo Settings showing startup, visibility, automatic hiding, and keyboard shortcut options">
+</p>
+
 ## Features
 
 - A minimal-width divider and compact 14-point toggle separate hidden and always-visible menu bar items.
