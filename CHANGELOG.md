@@ -8,6 +8,7 @@ All notable changes to Mo will be documented here. This project follows [Semanti
 
 - Added an optional 0–6 point menu-bar spacing control to fit more items around a display notch, with a one-click reset to the macOS default.
 - Added an embedded `mo` companion CLI with live status, visibility, settings, spacing, quit, JSON, and user-local installation commands.
+- Release tooling now exports locally and submits directly to `notarytool`, avoiding a dependency on an active Xcode account session.
 
 ## 1.0.2 - 2026-07-27
 

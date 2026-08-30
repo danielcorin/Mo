@@ -149,7 +149,7 @@ and `APPLE_ID_PASSWORD` when available, or prompts securely when the password
 is absent. Legacy `DEVELOPMENT_TEAM`, `DEVELOPER_IDENTITY`, and
 `NOTARY_APPLE_ID` variables remain supported.
 
-The script requires a clean branch synchronized with its upstream, creates a universal archive, Developer ID-signs and uploads it through Xcode, waits for notarization, verifies the exported app, produces ZIP and DMG artifacts, notarizes the outer DMG, writes SHA-256 checksums, and creates the GitHub release. Use `--dry-run` to inspect the release plan.
+The script requires a clean branch synchronized with its upstream, creates a universal archive, exports it with Developer ID signing, submits it directly to Apple for notarization, verifies the stapled app, produces ZIP and DMG artifacts, notarizes the outer DMG, writes SHA-256 checksums, and creates the GitHub release. Use `--dry-run` to inspect the release plan.
 
 ## Privacy and permissions
 

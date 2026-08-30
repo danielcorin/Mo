@@ -10,11 +10,11 @@ Usage:
   scripts/publish-release.sh --setup-notary-profile PROFILE --apple-id APPLE_ID
 
 With no app path, the script performs the complete release workflow: archive a
-universal Release build, Developer ID-sign and upload it with Xcode, wait for
-notarization, export the stapled app, create a ZIP and signed/notarized DMG,
-verify them, and optionally publish a GitHub Release.
+universal Release build, export it with Developer ID signing, notarize and
+staple it with notarytool, create a ZIP and signed/notarized DMG, verify them,
+and optionally publish a GitHub Release.
 
-An existing notarized app path skips the archive/upload/export steps.
+An existing notarized app path skips the archive/export/notarization steps.
 
 Release options:
   --version VERSION          Assert the configured app version.
@@ -49,8 +49,8 @@ Environment equivalents:
 Legacy aliases remain supported:
   DEVELOPER_IDENTITY, DEVELOPMENT_TEAM, NOTARY_APPLE_ID
 
-For DMG notarization, export APPLE_ID, APPLE_ID_PASSWORD, and TEAM_ID, or use a
-NOTARY_PROFILE stored in Keychain. APPLE_ID_PASSWORD is never printed.
+For app and DMG notarization, export APPLE_ID, APPLE_ID_PASSWORD, and TEAM_ID,
+or use a NOTARY_PROFILE stored in Keychain. APPLE_ID_PASSWORD is never printed.
 
 The project version and build number must already be committed. --version and
 --build verify those values; they never rewrite or silently override the source.
@@ -272,42 +272,6 @@ verify_app() {
     echo "Verified $PRODUCT_NAME $VERSION ($BUILD_NUMBER) and mo CLI, $architectures."
 }
 
-wait_for_notarized_export() {
-    local deadline output status elapsed
-
-    deadline=$((SECONDS + NOTARY_TIMEOUT_SECONDS))
-    echo "Waiting for Apple to notarize the app..."
-
-    while true; do
-        set +e
-        output="$(xcodebuild \
-            -exportNotarizedApp \
-            -archivePath "$ARCHIVE_PATH" \
-            -exportPath "$EXPORT_PATH" 2>&1)"
-        status=$?
-        set -e
-
-        if [[ "$status" -eq 0 ]]; then
-            printf '%s\n' "$output"
-            return
-        fi
-
-        if grep -Eq 'processing.*not ready for distribution' <<< "$output"; then
-            if [[ "$SECONDS" -ge "$deadline" ]]; then
-                printf '%s\n' "$output" >&2
-                fail "app notarization did not finish within ${NOTARY_TIMEOUT_SECONDS}s"
-            fi
-            elapsed=$((NOTARY_TIMEOUT_SECONDS - (deadline - SECONDS)))
-            echo "Notarization is still processing (${elapsed}s elapsed); checking again in ${NOTARY_POLL_SECONDS}s..."
-            sleep "$NOTARY_POLL_SECONDS"
-            continue
-        fi
-
-        printf '%s\n' "$output" >&2
-        fail "Xcode could not export the notarized app"
-    done
-}
-
 cleanup() {
     set +e
     if [[ -n "${WORK_DIR:-}" && -d "$WORK_DIR" ]]; then
@@ -336,7 +300,6 @@ NOTARY_PROFILE="${NOTARY_PROFILE:-}"
 APPLE_ID="${APPLE_ID:-${NOTARY_APPLE_ID:-}}"
 APPLE_ID_PASSWORD="${APPLE_ID_PASSWORD:-}"
 NOTARY_TIMEOUT_SECONDS="${NOTARY_TIMEOUT:-1800}"
-NOTARY_POLL_SECONDS=20
 GH_REPOSITORY="${GH_REPO:-}"
 OUT_DIR="${RELEASE_OUTPUT_DIR:-dist}"
 SETUP_PROFILE=""
@@ -542,7 +505,7 @@ if [[ -z "$IDENTITY" ]]; then
 fi
 [[ -n "$IDENTITY" ]] || fail "no Developer ID Application identity found for Team ID $TEAM_ID"
 
-if [[ "$SKIP_DMG_NOTARIZATION" -eq 0 ]]; then
+if [[ "$BUILD_FROM_SOURCE" -eq 1 || "$SKIP_DMG_NOTARIZATION" -eq 0 ]]; then
     if [[ -n "$NOTARY_PROFILE" ]]; then
         NOTARY_AUTH_MODE="profile"
     elif [[ -n "$APPLE_ID" && -n "$APPLE_ID_PASSWORD" ]]; then
@@ -550,7 +513,7 @@ if [[ "$SKIP_DMG_NOTARIZATION" -eq 0 ]]; then
     elif [[ -n "$APPLE_ID" || -n "$APPLE_ID_PASSWORD" ]]; then
         fail "both APPLE_ID and APPLE_ID_PASSWORD are required for environment-based notarization"
     else
-        fail "export APPLE_ID and APPLE_ID_PASSWORD, provide --notary-profile/NOTARY_PROFILE, or explicitly pass --skip-dmg-notarization"
+        fail "export APPLE_ID and APPLE_ID_PASSWORD or provide --notary-profile/NOTARY_PROFILE for notarization"
     fi
 fi
 
@@ -600,7 +563,7 @@ for command in ditto find grep hdiutil lipo mktemp plutil shasum spctl; do
     command_exists "$command"
 done
 
-if [[ "$SKIP_DMG_NOTARIZATION" -eq 0 ]]; then
+if [[ "$BUILD_FROM_SOURCE" -eq 1 || "$SKIP_DMG_NOTARIZATION" -eq 0 ]]; then
     if [[ "$NOTARY_AUTH_MODE" == "profile" ]]; then
         echo "Validating notary profile '$NOTARY_PROFILE'..."
     else
@@ -616,15 +579,15 @@ trap cleanup EXIT
 
 if [[ "$BUILD_FROM_SOURCE" -eq 1 ]]; then
     ARCHIVE_PATH="$WORK_DIR/$PRODUCT_NAME-$VERSION.xcarchive"
-    UPLOAD_PATH="$WORK_DIR/upload"
-    EXPORT_PATH="$WORK_DIR/notarized"
+    EXPORT_PATH="$WORK_DIR/signed"
     EXPORT_OPTIONS="$WORK_DIR/ExportOptions.plist"
+    APP_NOTARY_ZIP="$WORK_DIR/$PRODUCT_NAME-$VERSION-notarization.zip"
 
     plutil -create xml1 "$EXPORT_OPTIONS"
-    "$PLIST_BUDDY" -c 'Add :destination string upload' "$EXPORT_OPTIONS"
+    "$PLIST_BUDDY" -c 'Add :destination string export' "$EXPORT_OPTIONS"
     "$PLIST_BUDDY" -c 'Add :method string developer-id' "$EXPORT_OPTIONS"
-    "$PLIST_BUDDY" -c 'Add :signingCertificate string Developer ID Application' "$EXPORT_OPTIONS"
-    "$PLIST_BUDDY" -c 'Add :signingStyle string automatic' "$EXPORT_OPTIONS"
+    "$PLIST_BUDDY" -c "Add :signingCertificate string $IDENTITY" "$EXPORT_OPTIONS"
+    "$PLIST_BUDDY" -c 'Add :signingStyle string manual' "$EXPORT_OPTIONS"
     "$PLIST_BUDDY" -c "Add :teamID string $TEAM_ID" "$EXPORT_OPTIONS"
 
     echo "Archiving $PRODUCT_NAME $VERSION ($BUILD_NUMBER)..."
@@ -634,17 +597,22 @@ if [[ "$BUILD_FROM_SOURCE" -eq 1 ]]; then
         -allowProvisioningUpdates \
         archive
 
-    echo "Developer ID-signing and uploading the app to Apple..."
+    echo "Developer ID-signing and exporting the app..."
     xcodebuild \
         -exportArchive \
         -archivePath "$ARCHIVE_PATH" \
-        -exportPath "$UPLOAD_PATH" \
-        -exportOptionsPlist "$EXPORT_OPTIONS" \
-        -allowProvisioningUpdates
+        -exportPath "$EXPORT_PATH" \
+        -exportOptionsPlist "$EXPORT_OPTIONS"
 
-    wait_for_notarized_export
     APP_PATH="$(find "$EXPORT_PATH" -maxdepth 1 -type d -name '*.app' -print -quit)"
     [[ -n "$APP_PATH" && -d "$APP_PATH" ]] || fail "Xcode exported no app at $EXPORT_PATH"
+
+    echo "Submitting the app for notarization..."
+    ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$APP_NOTARY_ZIP"
+    notarytool_with_auth submit "$APP_NOTARY_ZIP" \
+        --wait \
+        --timeout "${NOTARY_TIMEOUT_SECONDS}s"
+    xcrun stapler staple "$APP_PATH"
 fi
 
 verify_app
@@ -679,7 +647,9 @@ codesign --verify --verbose=4 "$DMG_PATH"
 
 if [[ "$SKIP_DMG_NOTARIZATION" -eq 0 ]]; then
     echo "Submitting the DMG for notarization..."
-    notarytool_with_auth submit "$DMG_PATH" --wait
+    notarytool_with_auth submit "$DMG_PATH" \
+        --wait \
+        --timeout "${NOTARY_TIMEOUT_SECONDS}s"
     xcrun stapler staple "$DMG_PATH"
     xcrun stapler validate "$DMG_PATH"
     spctl --assess --type open --context context:primary-signature --verbose=4 "$DMG_PATH"
