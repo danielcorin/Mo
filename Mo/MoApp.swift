@@ -9,7 +9,8 @@ struct MoApp: App {
             SettingsView(
                 controller: appDelegate.menuBarController,
                 preferences: appDelegate.preferences,
-                loginItemManager: appDelegate.loginItemManager
+                loginItemManager: appDelegate.loginItemManager,
+                menuBarSpacingManager: appDelegate.menuBarSpacingManager
             )
         }
         .commands {
@@ -22,6 +23,7 @@ struct MoApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let preferences = MoPreferences()
     let loginItemManager = LoginItemManager()
+    let menuBarSpacingManager = MenuBarSpacingManager()
     lazy var menuBarController: MenuBarController = {
         let controller = MenuBarController(preferences: preferences)
         controller.onOpenSettings = { [weak self] in
@@ -29,6 +31,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         return controller
     }()
+    lazy var companionCommandServer = CompanionCommandServer(
+        controller: menuBarController,
+        preferences: preferences,
+        spacingManager: menuBarSpacingManager,
+        onOpenSettings: { [weak self] in self?.openSettings() },
+        onQuit: { NSApp.terminate(nil) }
+    )
     private(set) var settingsWindowController: NSWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -37,6 +46,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         NSApp.setActivationPolicy(.accessory)
         menuBarController.start()
+        companionCommandServer.start()
         loginItemManager.refresh()
 
         if preferences.shouldEnableLaunchAtLoginOnFirstRun {
@@ -53,6 +63,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        companionCommandServer.stop()
         menuBarController.stop()
     }
 
@@ -79,7 +90,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let rootView = SettingsView(
             controller: menuBarController,
             preferences: preferences,
-            loginItemManager: loginItemManager
+            loginItemManager: loginItemManager,
+            menuBarSpacingManager: menuBarSpacingManager
         )
         let hostingController = NSHostingController(rootView: rootView)
         let window = NSWindow(

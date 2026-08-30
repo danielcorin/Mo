@@ -77,6 +77,22 @@ grep -q "^Authority=Developer ID Application" <<<"$signing_info" \
     || fail "build is not Developer ID signed; the Accessibility pane would refuse to register it"
 BUNDLE_ID="$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$BUILT_APP/Contents/Info.plist")"
 
+cli_name="$(tr '[:upper:]' '[:lower:]' <<<"$APP_NAME")"
+built_cli="$BUILT_APP/Contents/Helpers/$cli_name"
+bundled_cli="$INSTALL_PATH/Contents/Helpers/$cli_name"
+cli_link="$HOME/.local/bin/$cli_name"
+if [[ -x "$built_cli" ]]; then
+    if [[ -L "$cli_link" ]]; then
+        existing_target="$(readlink "$cli_link")"
+        case "$existing_target" in
+            *"/$APP_NAME.app/Contents/Helpers/$cli_name") ;;
+            *) fail "refusing to replace unrelated CLI symlink at $cli_link" ;;
+        esac
+    elif [[ -e "$cli_link" ]]; then
+        fail "refusing to replace existing file at $cli_link"
+    fi
+fi
+
 old_requirement="$(codesign -d -r- "$INSTALL_PATH" 2>/dev/null || true)"
 new_requirement="$(codesign -d -r- "$BUILT_APP" 2>/dev/null || true)"
 
@@ -103,6 +119,27 @@ ditto "$BUILT_APP" "$staging_dir/$APP_NAME.app"
 rm -rf "$INSTALL_PATH"
 mv "$staging_dir/$APP_NAME.app" "$INSTALL_PATH"
 rmdir "$staging_dir"
+
+# Keep the user-local companion command pointed at the stable installed app.
+if [[ -x "$bundled_cli" ]]; then
+    mkdir -p "$(dirname "$cli_link")"
+    if [[ -L "$cli_link" ]]; then
+        existing_target="$(readlink "$cli_link")"
+        case "$existing_target" in
+            *"/$APP_NAME.app/Contents/Helpers/$cli_name")
+                ln -sfn "$bundled_cli" "$cli_link"
+                ;;
+            *)
+                fail "refusing to replace unrelated CLI symlink at $cli_link"
+                ;;
+        esac
+    elif [[ -e "$cli_link" ]]; then
+        fail "refusing to replace existing file at $cli_link"
+    else
+        ln -s "$bundled_cli" "$cli_link"
+    fi
+    echo "Command line tool: $cli_link -> $bundled_cli"
+fi
 
 # macOS binds permission grants (TCC) to the code signature; a record left
 # by a differently signed copy silently blocks new permission prompts.

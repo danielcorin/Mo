@@ -13,8 +13,9 @@ bash .agents/skills/try-it/scripts/try-it.sh
 
 The script builds Release with manual Developer ID signing, quits any running
 copy, atomically replaces `/Applications/Mo.app`, resets the app's TCC
-records only when the code signature actually changed, relaunches, and
-verifies the app is running. Do not build or install by hand instead — the
+records only when the code signature actually changed, refreshes the
+`~/.local/bin/mo` companion CLI symlink, relaunches, and verifies the app is
+running. Do not build or install by hand instead — the
 signing identity and the TCC-reset comparison are load-bearing (see comments
 in the script).
 

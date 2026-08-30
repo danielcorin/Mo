@@ -4,7 +4,7 @@ import SwiftUI
 
 enum SettingsWindowLayout {
     static let width: CGFloat = 560
-    static let height: CGFloat = 520
+    static let height: CGFloat = 650
     static let contentSize = NSSize(width: width, height: height)
 }
 
@@ -12,6 +12,7 @@ struct SettingsView: View {
     @ObservedObject var controller: MenuBarController
     @ObservedObject var preferences: MoPreferences
     @ObservedObject var loginItemManager: LoginItemManager
+    @ObservedObject var menuBarSpacingManager: MenuBarSpacingManager
 
     var body: some View {
         Form {
@@ -57,6 +58,54 @@ struct SettingsView: View {
                 )
                 .font(.callout)
                 .foregroundStyle(.secondary)
+            }
+
+            Section("Menu bar spacing") {
+                Toggle(
+                    "Use compact spacing",
+                    isOn: Binding(
+                        get: { menuBarSpacingManager.usesCustomSpacing },
+                        set: { menuBarSpacingManager.setCustomSpacingEnabled($0) }
+                    )
+                )
+
+                if menuBarSpacingManager.usesCustomSpacing {
+                    LabeledContent("Spacing") {
+                        Stepper(
+                            value: Binding(
+                                get: { menuBarSpacingManager.spacing },
+                                set: { menuBarSpacingManager.setSpacing($0) }
+                            ),
+                            in: MenuBarSpacingManager.allowedSpacing
+                        ) {
+                            Text("\(menuBarSpacingManager.spacing) pt")
+                                .monospacedDigit()
+                                .frame(minWidth: 32, alignment: .trailing)
+                        }
+                        .accessibilityLabel("Menu bar item spacing")
+                    }
+                }
+
+                Text(
+                    "Smaller values fit more items around a display notch. This changes spacing for every app’s menu bar items."
+                )
+                .font(.callout)
+                .foregroundStyle(.secondary)
+
+                if menuBarSpacingManager.requiresSignOut {
+                    Label(
+                        "Sign out and back in to apply this change.",
+                        systemImage: "person.crop.circle.badge.clock"
+                    )
+                    .font(.callout)
+                    .foregroundStyle(.orange)
+                }
+
+                if let error = menuBarSpacingManager.errorMessage {
+                    Label(error, systemImage: "exclamationmark.triangle.fill")
+                        .font(.callout)
+                        .foregroundStyle(.red)
+                }
             }
 
             Section("Keyboard shortcut") {

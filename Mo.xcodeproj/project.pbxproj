@@ -6,7 +6,41 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C0DEC2043001D80200EEF7E8 /* libMoCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C0DEC2073001D80200EEF7E8 /* libMoCore.a */; };
+		C0DEC2053001D80200EEF7E8 /* libMoCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C0DEC2073001D80200EEF7E8 /* libMoCore.a */; };
+		C0DEC2063001D80200EEF7E8 /* libMoCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C0DEC2073001D80200EEF7E8 /* libMoCore.a */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
+		C0DEC2003001D80200EEF7E8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B184C720300546C700F2E851 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C0DEC2113001D80200EEF7E8;
+			remoteInfo = MoCLI;
+		};
+		C0DEC2013001D80200EEF7E8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B184C720300546C700F2E851 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C0DEC2103001D80200EEF7E8;
+			remoteInfo = MoCore;
+		};
+		C0DEC2023001D80200EEF7E8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B184C720300546C700F2E851 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C0DEC2103001D80200EEF7E8;
+			remoteInfo = MoCore;
+		};
+		C0DEC2033001D80200EEF7E8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B184C720300546C700F2E851 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C0DEC2103001D80200EEF7E8;
+			remoteInfo = MoCore;
+		};
 		C0DEC0F13001D80200EEF7EB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B184C720300546C700F2E851 /* Project object */;
@@ -18,6 +52,8 @@
 
 /* Begin PBXFileReference section */
 		B184C728300546C700F2E851 /* Mo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0DEC2073001D80200EEF7E8 /* libMoCore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMoCore.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0DEC2083001D80200EEF7E8 /* mo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = mo; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0DEC0F03001D80200EEF7E8 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
 		C0DEC0F03001D80200EEF7E9 /* Local.xcconfig.example */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Local.xcconfig.example; sourceTree = "<group>"; };
 		C0DEC0F13001D80200EEF7E1 /* MoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -34,6 +70,16 @@
 			path = MoTests;
 			sourceTree = "<group>";
 		};
+		C0DEC2093001D80200EEF7E8 /* MoCore */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MoCore;
+			sourceTree = "<group>";
+		};
+		C0DEC20A3001D80200EEF7E8 /* MoCLI */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MoCLI;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +87,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0DEC2043001D80200EEF7E8 /* libMoCore.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -48,6 +95,22 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0DEC2063001D80200EEF7E8 /* libMoCore.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0DEC20B3001D80200EEF7E8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0DEC20C3001D80200EEF7E8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0DEC2053001D80200EEF7E8 /* libMoCore.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -58,6 +121,8 @@
 			isa = PBXGroup;
 			children = (
 				B184C72A300546C700F2E851 /* Mo */,
+				C0DEC2093001D80200EEF7E8 /* MoCore */,
+				C0DEC20A3001D80200EEF7E8 /* MoCLI */,
 				C0DEC0F13001D80200EEF7E2 /* MoTests */,
 				C0DEC0F03001D80200EEF7EA /* Configuration */,
 				B184C729300546C700F2E851 /* Products */,
@@ -68,6 +133,8 @@
 			isa = PBXGroup;
 			children = (
 				B184C728300546C700F2E851 /* Mo.app */,
+				C0DEC2073001D80200EEF7E8 /* libMoCore.a */,
+				C0DEC2083001D80200EEF7E8 /* mo */,
 				C0DEC0F13001D80200EEF7E1 /* MoTests.xctest */,
 			);
 			name = Products;
@@ -92,10 +159,13 @@
 				B184C724300546C700F2E851 /* Sources */,
 				B184C725300546C700F2E851 /* Frameworks */,
 				B184C726300546C700F2E851 /* Resources */,
+				C0DEC2123001D80200EEF7E8 /* Embed Mo CLI */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				C0DEC2133001D80200EEF7E8 /* PBXTargetDependency */,
+				C0DEC2143001D80200EEF7E8 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				B184C72A300546C700F2E851 /* Mo */,
@@ -106,6 +176,49 @@
 			productName = Mo;
 			productReference = B184C728300546C700F2E851 /* Mo.app */;
 			productType = "com.apple.product-type.application";
+		};
+		C0DEC2103001D80200EEF7E8 /* MoCore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0DEC2243001D80200EEF7E8 /* Build configuration list for PBXNativeTarget "MoCore" */;
+			buildPhases = (
+				C0DEC2173001D80200EEF7E8 /* Sources */,
+				C0DEC20B3001D80200EEF7E8 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				C0DEC2093001D80200EEF7E8 /* MoCore */,
+			);
+			name = MoCore;
+			packageProductDependencies = (
+			);
+			productName = MoCore;
+			productReference = C0DEC2073001D80200EEF7E8 /* libMoCore.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		C0DEC2113001D80200EEF7E8 /* MoCLI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0DEC2253001D80200EEF7E8 /* Build configuration list for PBXNativeTarget "MoCLI" */;
+			buildPhases = (
+				C0DEC2183001D80200EEF7E8 /* Sources */,
+				C0DEC20C3001D80200EEF7E8 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C0DEC2153001D80200EEF7E8 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C0DEC20A3001D80200EEF7E8 /* MoCLI */,
+			);
+			name = MoCLI;
+			packageProductDependencies = (
+			);
+			productName = mo;
+			productReference = C0DEC2083001D80200EEF7E8 /* mo */;
+			productType = "com.apple.product-type.tool";
 		};
 		C0DEC0F13001D80200EEF7E6 /* MoTests */ = {
 			isa = PBXNativeTarget;
@@ -119,6 +232,7 @@
 			);
 			dependencies = (
 				C0DEC0F13001D80200EEF7EA /* PBXTargetDependency */,
+				C0DEC2163001D80200EEF7E8 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				C0DEC0F13001D80200EEF7E2 /* MoTests */,
@@ -143,6 +257,12 @@
 					B184C727300546C700F2E851 = {
 						CreatedOnToolsVersion = 26.1.1;
 					};
+					C0DEC2103001D80200EEF7E8 = {
+						CreatedOnToolsVersion = 26.1.1;
+					};
+					C0DEC2113001D80200EEF7E8 = {
+						CreatedOnToolsVersion = 26.1.1;
+					};
 					C0DEC0F13001D80200EEF7E6 = {
 						CreatedOnToolsVersion = 26.1.1;
 						TestTargetID = B184C727300546C700F2E851;
@@ -164,6 +284,8 @@
 			projectRoot = "";
 			targets = (
 				B184C727300546C700F2E851 /* Mo */,
+				C0DEC2103001D80200EEF7E8 /* MoCore */,
+				C0DEC2113001D80200EEF7E8 /* MoCLI */,
 				C0DEC0F13001D80200EEF7E6 /* MoTests */,
 			);
 		};
@@ -201,9 +323,62 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C0DEC2173001D80200EEF7E8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0DEC2183001D80200EEF7E8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		C0DEC2123001D80200EEF7E8 /* Embed Mo CLI */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/mo",
+			);
+			name = "Embed Mo CLI";
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(CONTENTS_FOLDER_PATH)/Helpers/mo",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "mkdir -p \"${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers\"\nditto \"${BUILT_PRODUCTS_DIR}/mo\" \"${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/mo\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXTargetDependency section */
+		C0DEC2133001D80200EEF7E8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C0DEC2113001D80200EEF7E8 /* MoCLI */;
+			targetProxy = C0DEC2003001D80200EEF7E8 /* PBXContainerItemProxy */;
+		};
+		C0DEC2143001D80200EEF7E8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C0DEC2103001D80200EEF7E8 /* MoCore */;
+			targetProxy = C0DEC2013001D80200EEF7E8 /* PBXContainerItemProxy */;
+		};
+		C0DEC2153001D80200EEF7E8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C0DEC2103001D80200EEF7E8 /* MoCore */;
+			targetProxy = C0DEC2023001D80200EEF7E8 /* PBXContainerItemProxy */;
+		};
+		C0DEC2163001D80200EEF7E8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C0DEC2103001D80200EEF7E8 /* MoCore */;
+			targetProxy = C0DEC2033001D80200EEF7E8 /* PBXContainerItemProxy */;
+		};
 		C0DEC0F13001D80200EEF7EA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B184C727300546C700F2E851 /* Mo */;
@@ -336,12 +511,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Mo/Mo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Mo contributors";
@@ -349,7 +526,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -366,12 +543,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Mo/Mo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Mo contributors";
@@ -379,7 +558,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -422,6 +601,60 @@
 			};
 			name = Release;
 		};
+		C0DEC2203001D80200EEF7E8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEFINES_MODULE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_NAME = MoCore;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		C0DEC2213001D80200EEF7E8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEFINES_MODULE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_NAME = MoCore;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		C0DEC2223001D80200EEF7E8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C0DEC0F03001D80200EEF7E8 /* Shared.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				ENABLE_HARDENED_RUNTIME = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_MODULE_NAME = MoCommand;
+				PRODUCT_NAME = mo;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		C0DEC2233001D80200EEF7E8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C0DEC0F03001D80200EEF7E8 /* Shared.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				ENABLE_HARDENED_RUNTIME = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_MODULE_NAME = MoCommand;
+				PRODUCT_NAME = mo;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -448,6 +681,24 @@
 			buildConfigurations = (
 				C0DEC0F13001D80200EEF7E8 /* Debug */,
 				C0DEC0F13001D80200EEF7E9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C0DEC2243001D80200EEF7E8 /* Build configuration list for PBXNativeTarget "MoCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0DEC2203001D80200EEF7E8 /* Debug */,
+				C0DEC2213001D80200EEF7E8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C0DEC2253001D80200EEF7E8 /* Build configuration list for PBXNativeTarget "MoCLI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0DEC2223001D80200EEF7E8 /* Debug */,
+				C0DEC2233001D80200EEF7E8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

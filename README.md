@@ -22,6 +22,8 @@ Mo is a small, native macOS menu bar app that keeps the menu bar tidy. Put items
 - A configurable global shortcut toggles the hidden section (default: `⌃⌥M`).
 - Command-comma remains reserved for each foreground app's Settings command and cannot be assigned globally.
 - Hidden items can rehide after 5, 10, 30, or 60 seconds, when the active app changes, or never.
+- Optional compact system-wide menu-bar spacing can fit more items around a display notch.
+- An embedded `mo` command provides local automation and JSON status output.
 - Mo registers itself to launch at login on first run, subject to macOS approval.
 - Settings and item positions persist between launches.
 - No Accessibility, Input Monitoring, Screen Recording, analytics, or network access.
@@ -74,6 +76,40 @@ xcodebuild \
   test
 ```
 
+The app build embeds the companion command at
+`Mo.app/Contents/Helpers/mo`.
+
+## Command-line tool
+
+After copying Mo to `/Applications`, install its command into your user-local
+bin directory:
+
+```sh
+/Applications/Mo.app/Contents/Helpers/mo install
+```
+
+This creates `~/.local/bin/mo` without requiring administrator privileges or
+overwriting an unrelated file. Ensure `~/.local/bin` is on `PATH`, then use:
+
+```sh
+mo status
+mo status --json
+mo show
+mo hide
+mo toggle
+mo settings
+mo spacing
+mo spacing 3
+mo spacing default
+mo quit
+```
+
+The CLI launches Mo when a command needs the running app. It sends typed local
+requests to the same controllers used by the UI, so UI and command-line state
+stay in sync. Spacing accepts 0 through 6 points; changing or resetting it
+requires signing out and back in before macOS applies the new value. Every
+state and action command supports `--json` for scripts and agents.
+
 The app icon source of truth is `Mo/AppIcon.icon`, an [Icon Composer](https://developer.apple.com/icon-composer/) document. Xcode 26 and later compiles it into the layered macOS 26 icon and generates flattened fallbacks for older macOS versions. Edit it in Icon Composer, or edit `icon.json` and the layer assets directly.
 
 When building with an Xcode older than 26, the legacy `AppIcon.appiconset` is used instead. Regenerate its PNG sizes after changing `Artwork/AppIcon.svg` with:
@@ -86,29 +122,38 @@ scripts/generate-app-icon.sh
 
 The release workflow follows the same signing approach as [Reco](https://github.com/danielcorin/Reco). Signing details can remain in the ignored `Configuration/Local.xcconfig`, or be supplied through environment variables. The release script resolves the version, build number, bundle ID, and development team from those inputs and Xcode.
 
-For a non-interactive notarized build, copy the environment template and fill in the ignored `.env`. The committed `.envrc` loads it through [direnv](https://direnv.net/):
+For a non-interactive notarized build, copy the environment template, fill in
+the ignored `.env`, and trust the committed [mise](https://mise.jdx.dev/)
+configuration once:
 
 ```sh
 cp .env.example .env
 $EDITOR .env
-direnv allow
+mise trust
 ```
 
-If you do not use direnv, export the same variables from your shell or secret manager instead. Never place credentials in `.envrc` or commit `.env`.
+`mise exec --` loads the release variables from `.env` and redacts their values
+from mise output. Alternatively, export the same variables from your shell or
+secret manager. Never place credentials in `mise.toml` or commit `.env`.
 
 Before a release, update `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION`, then commit and push the changes. Run:
 
 ```sh
-scripts/publish-release.sh --publish
+mise exec -- scripts/publish-release.sh --publish
 ```
 
-As a Keychain-based alternative, run `scripts/publish-release.sh --setup-notary-profile MoNotary` once, then publish with `NOTARY_PROFILE=MoNotary`. The setup command uses `APPLE_ID` and `APPLE_ID_PASSWORD` when available, or prompts securely when the password is absent. Legacy `DEVELOPMENT_TEAM`, `DEVELOPER_IDENTITY`, and `NOTARY_APPLE_ID` variables remain supported.
+As a Keychain-based alternative, run
+`mise exec -- scripts/publish-release.sh --setup-notary-profile MoNotary` once,
+then publish with `NOTARY_PROFILE=MoNotary`. The setup command uses `APPLE_ID`
+and `APPLE_ID_PASSWORD` when available, or prompts securely when the password
+is absent. Legacy `DEVELOPMENT_TEAM`, `DEVELOPER_IDENTITY`, and
+`NOTARY_APPLE_ID` variables remain supported.
 
 The script requires a clean branch synchronized with its upstream, creates a universal archive, Developer ID-signs and uploads it through Xcode, waits for notarization, verifies the exported app, produces ZIP and DMG artifacts, notarizes the outer DMG, writes SHA-256 checksums, and creates the GitHub release. Use `--dry-run` to inspect the release plan.
 
 ## Privacy and permissions
 
-Mo is sandboxed and works by changing only the width of its own status item. It does not inspect, capture, or control other applications. The global shortcut uses macOS's system hotkey registration instead of a keyboard event tap, so it does not require Accessibility or Input Monitoring permission.
+Mo is sandboxed and hides items by changing only the width of its own status item. Its optional compact-spacing control updates two current-host global preferences and can remove them to restore the macOS default. It does not inspect, capture, or control other applications. The global shortcut uses macOS's system hotkey registration instead of a keyboard event tap, so it does not require Accessibility or Input Monitoring permission.
 
 On first launch, Mo asks macOS to register it as a login item. If macOS requires approval, Mo links directly to System Settings → General → Login Items. See [PRIVACY.md](PRIVACY.md) for the complete privacy statement and [ARCHITECTURE.md](ARCHITECTURE.md) for implementation details.
 

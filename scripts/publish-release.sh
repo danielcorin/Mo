@@ -222,6 +222,7 @@ prepare_github_release() {
 
 verify_app() {
     local actual_version actual_build actual_bundle actual_team signature_info executable architectures
+    local helper helper_signature helper_team helper_architectures
 
     echo "Verifying exported app..."
     codesign --verify --deep --strict --verbose=4 "$APP_PATH"
@@ -251,7 +252,24 @@ verify_app() {
         *) fail "the exported app is missing the x86_64 architecture" ;;
     esac
 
-    echo "Verified $PRODUCT_NAME $VERSION ($BUILD_NUMBER), $architectures."
+    helper="$APP_PATH/Contents/Helpers/mo"
+    [[ -x "$helper" ]] || fail "the exported app is missing its mo companion CLI"
+    codesign --verify --strict --verbose=4 "$helper"
+    helper_signature="$(codesign -dvvv "$helper" 2>&1)"
+    helper_team="$(awk -F= '/^TeamIdentifier=/ { print $2; exit }' <<< "$helper_signature")"
+    helper_architectures="$(lipo -archs "$helper")"
+    [[ "$helper_team" == "$TEAM_ID" ]] || fail "the mo CLI Team ID is $helper_team, expected $TEAM_ID"
+    grep -q 'flags=.*runtime' <<< "$helper_signature" || fail "the mo CLI is missing hardened runtime"
+    case " $helper_architectures " in
+        *" arm64 "*) ;;
+        *) fail "the mo CLI is missing the arm64 architecture" ;;
+    esac
+    case " $helper_architectures " in
+        *" x86_64 "*) ;;
+        *) fail "the mo CLI is missing the x86_64 architecture" ;;
+    esac
+
+    echo "Verified $PRODUCT_NAME $VERSION ($BUILD_NUMBER) and mo CLI, $architectures."
 }
 
 wait_for_notarized_export() {
@@ -494,7 +512,7 @@ if [[ -n "$SETUP_PROFILE" ]]; then
             --team-id "$TEAM_ID"
     fi
     echo "Stored and validated notary profile '$SETUP_PROFILE'."
-    echo "Use it with: NOTARY_PROFILE='$SETUP_PROFILE' scripts/publish-release.sh --publish"
+    echo "Use it with: NOTARY_PROFILE='$SETUP_PROFILE' mise exec -- scripts/publish-release.sh --publish"
     exit 0
 fi
 

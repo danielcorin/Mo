@@ -6,6 +6,7 @@ build/
 dist/
 *.xcarchive
 *.dSYM
+*.profraw
 *.xcuserstate
 xcuserdata/
 
@@ -18,4 +19,6 @@ Configuration/Local.xcconfig
 
 # Local development notes
 /prompts.md
+
+# mise-loaded release secrets
 /.env

@@ -4,6 +4,11 @@ All notable changes to Mo will be documented here. This project follows [Semanti
 
 ## Unreleased
 
+## 1.1.0 - 2026-08-29
+
+- Added an optional 0–6 point menu-bar spacing control to fit more items around a display notch, with a one-click reset to the macOS default.
+- Added an embedded `mo` companion CLI with live status, visibility, settings, spacing, quit, JSON, and user-local installation commands.
+
 ## 1.0.2 - 2026-07-27
 
 - Fixed a memory leak that grew Mo's footprint to hundreds of megabytes over days of use. The collapsed divider reserved a fixed 10,000 points, and AppKit backed that status item's window with a buffer sized to its width, reallocating it on every menu bar relayout without releasing the previous one.
